@@ -1,0 +1,177 @@
+%{
+   #include "sintactico.hpp"
+   #include <string.h>
+   #include <stdio.h>
+   #include <stdlib.h>
+   
+   /* #pragma warning(disable: 4273 6011) */
+   
+   
+   int columna = 1;
+   int linea = 1;
+   char cadena[200];
+   
+   extern int yyerror(const char *s);
+   
+%}
+
+%option outfile="escaner.cpp"
+
+IDENTIFICADOR [a-zA-Z][a-zA-Z0-9]* 
+NUMERO [0-9]*
+
+
+%%
+
+  /* variables */
+IF	{
+		return IF;
+	}
+	
+     
+THEN	{
+		return THEN;
+     	}
+     	
+     	
+ELSE	{
+		return ELSE;
+	}
+	
+	
+END	{
+		return END;
+	}
+	
+	
+REPEAT	{
+		return REPEAT
+	}
+	
+	
+UNTIL	{
+		return UNTIL;
+	}
+	
+	
+READ	{
+		return READ;
+	}
+	
+	
+WRITE	{
+		return WRITE;
+	}
+
+":" {
+	columna += strlen(yytext); 
+	return DOS_PUNTOS;
+    }
+
+"<" { 
+	columna += strlen(yytext); 
+	return MENOR; 
+    }
+
+">" { 
+	columna += strlen(yytext); 
+	return MAYOR;
+    }
+
+"=" { 
+	columna += strlen(yytext); 
+	return IGUAL;
+    }
+
+"<>"{ 
+	columna += strlen(yytext); 
+	return MENOR_MAYOR;
+    }
+
+"<=" { 
+	columna += strlen(yytext); 
+	return MENOR_O_IGUAL;
+     }
+
+">=" { 
+	columna += strlen(yytext); 
+	return MAYOR_O_IGUAL;
+     }
+
+"+" { 
+	columna += strlen(yytext); 
+	return MAS; 
+    }
+
+"-" { 
+	columna += strlen(yytext); 
+	return MENOS; 
+    }
+
+"*" { 
+	columna += strlen(yytext); 
+	return MULTIPLI; 
+    }
+
+"/" { 
+	columna += strlen(yytext); 
+	return DIVISION; 
+    }
+
+'(' {
+	columna += strlen(yytext); 
+	return PARENT_IZQ;
+    }
+
+')' {
+	columna += strlen(yytext); 
+	return PARENT_DER;
+    }
+	
+{IDENTIFICADOR}	{
+			return IDENTIFICADOR;
+		}
+     
+{NUMERO}	{
+			return NUMERO;
+		}
+       	     	
+  /* nueva linea */
+[\n] { 
+	linea++; 
+	columna = 1;
+	return CAMBIO_DE_LINEA; 
+     }
+
+  /* operadores */
+
+
+  /* otros simbolos */
+";"  { 
+	columna += strlen(yytext);
+	return PUNTO_Y_COMA; 
+     }
+
+  /* salta espacios en blanco */
+[ \t] {
+	 columna += strlen(yytext);
+      }
+	
+
+  /* comando print */
+"print" {
+		columna += strlen(yytext);
+		return CMD_PRINT;
+        }
+
+
+
+  /* cualquier otra cosa es un error */
+. yyerror("caracter invalido");
+
+%%
+
+int yywrap(void) 
+{
+   return 1;
+}
