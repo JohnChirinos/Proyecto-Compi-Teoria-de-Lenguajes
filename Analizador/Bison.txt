@@ -1,4 +1,4 @@
-%token IF THEN ELSE END REPEAT UNTIL READ WRITE PUNTO_Y_COMA IDENTIFICADOR NUMERO	
+%token IF THEN ELSE END REPEAT UNTIL READ WRITE PUNTO_Y_COMA DOS_PUNTOS MENOR MAYOR IGUAL MENOR_MAYOR MENOR_O_IGUAL MAYOR_O_IGUAL MAS MENOS MULTIPLI DIVISION PARENT_IZQ PARENT_DER IDENTIFICADOR NUMERO	
 
 
 %{
@@ -64,7 +64,9 @@ instruccion:
 	   | instruccion_write	{ 
 					
 				}
-	   | error
+	   | error	{
+
+			}
    ;
    
    
@@ -77,19 +79,23 @@ instruccion_if:
 	   
 	   							}
 	   							
-	   | secuencia_instrucciones END
+	   | secuencia_instrucciones END	{
+
+						}
    ;
 	
 	
 instruccion_repeat:
-	     REPEAT secuencia_instrucciones UNTIL expresion
+	     REPEAT secuencia_instrucciones UNTIL expresion	{
+								
+								}
    ;
    
    
 instruccion_asignacion:
-             IDENTIFICADOR '=' expresion	{
-             
-             					}
+             IDENTIFICADOR DOS_PUNTOS IGUAL expresion	{
+             							$$ = $4
+             						}
    ;
    
    
@@ -109,27 +115,27 @@ instrucciones_write:
     
 expresion:
 	     expresion_simple '<' expresion_simple	{
-	     
+	     							$$ = $1 < $3
 	     						}
 	     					
 	   | expresion_simple '>' expresion_simple	{
-	     
+	     							$$ = $1 > $3
 	     						}
 	     						
 	   | expresion_simple '=' expresion_simple	{
-	     
+	     							$$ = $3
 	     						}
 	     						
 	   | expresion_simple '<>' expresion_simple	{
-	     
+	     							/* No estoy seguro que va a en este */
 	     						}  
 	     						
 	   | expresion_simple '<=' expresion_simple	{
-	   	     
+	   	     						$$ = $1 <= $3
 	     						}
 	     						
 	   | expresion_simple '>=' expresion_simple	{
-	   	     
+	   	     						$$ = $1 >= $3
 	     						}
 	     						
 	   | expresion_simple	{
@@ -139,12 +145,12 @@ expresion:
 	
 	
 expresion_simple:
-	     expresion_simple '+' termino	{
-		
+	     expresion_simple MAS termino	{
+							$$ = $1 + $3
 						}
 						
-	   | expresion_simple '-' termino	{
-	   
+	   | expresion_simple MENOS termino	{
+	   						$$ = $1 - $3
 	   					}
 	   					
 	   | termino
@@ -153,13 +159,13 @@ expresion_simple:
    
    
 termino:
-	     termino '*' factor	{
-	     
-	     			}
+	     termino MULTIPLI factor	{
+	     					$$ = $1 * $3
+	     				}
 	    
-	   | termino '/' factor	{
-	   
-	   			}
+	   | termino DIVISION factor	{
+	   					$$ = $1 / $3
+	   				}
 	   			
 	   | factor	{
 	   
@@ -168,16 +174,16 @@ termino:
    
    
 factor:
-	     '(' expresion ')'	{
-	      
-	      			}
+	     PARENT_IZQ expresion PARENT_DER	{
+	      						$$ = $2
+	      					}
 	     
 	   | NUMERO	{
-	   
+	   			$$ = $1
 	   		}
 	   		
 	   | IDENTIFICADOR	{
-	   
+	   			
 	   			}
 	   			
 	   | error	{

@@ -62,6 +62,71 @@ READ	{
 WRITE	{
 		return WRITE;
 	}
+
+":" {
+	columna += strlen(yytext); 
+	return DOS_PUNTOS;
+    }
+
+"<" { 
+	columna += strlen(yytext); 
+	return MENOR; 
+    }
+
+">" { 
+	columna += strlen(yytext); 
+	return MAYOR;
+    }
+
+"=" { 
+	columna += strlen(yytext); 
+	return IGUAL;
+    }
+
+"<>"{ 
+	columna += strlen(yytext); 
+	return MENOR_MAYOR;
+    }
+
+"<=" { 
+	columna += strlen(yytext); 
+	return MENOR_O_IGUAL;
+     }
+
+">=" { 
+	columna += strlen(yytext); 
+	return MAYOR_O_IGUAL;
+     }
+
+"+" { 
+	columna += strlen(yytext); 
+	return MAS; 
+    }
+
+"-" { 
+	columna += strlen(yytext); 
+	return MENOS; 
+    }
+
+"*" { 
+	columna += strlen(yytext); 
+	return MULTIPLI; 
+    }
+
+"/" { 
+	columna += strlen(yytext); 
+	return DIVISION; 
+    }
+
+'(' {
+	columna += strlen(yytext); 
+	return PARENT_IZQ;
+    }
+
+')' {
+	columna += strlen(yytext); 
+	return PARENT_DER;
+    }
 	
 {IDENTIFICADOR}	{
 			return IDENTIFICADOR;
@@ -69,7 +134,6 @@ WRITE	{
      
 {NUMERO}	{
 			return NUMERO;
-			
 		}
        	     	
   /* nueva linea */
@@ -87,12 +151,6 @@ WRITE	{
 	columna += strlen(yytext);
 	return PUNTO_Y_COMA; 
      }
-
-","  { 
-	columna += strlen(yytext);
-	return COMA; 
-     }
-
 
   /* salta espacios en blanco */
 [ \t] {
