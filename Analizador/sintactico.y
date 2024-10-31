@@ -1,5 +1,5 @@
-%token <numero> NUMERO
-%token <texto> IDENTIFICADOR
+%token NUMERO
+%token IDENTIFICADOR
 %token IF THEN ELSE END REPEAT UNTIL READ WRITE ASIGNACION PUNTOYCOMA
 %token MAS MENOS MULTIPLICACION DIVISION
 %token MENOR MAYOR IGUAL DIFERENTE MENOR_IGUAL MAYOR_IGUAL
@@ -8,9 +8,15 @@
 %{
    #include <stdio.h>
    #include <stdlib.h>
+   #include <string.h>
+   
+   extern unsigned int columna;
+   extern unsigned int linea;
    extern int yylex();
    extern FILE *yyin;
    int yyerror(const char *s);
+   
+   #pragma warning(disable: 4996 4065 6385 6262)
 %}
 
 %union {
@@ -18,8 +24,8 @@
    char* texto;
 }
 
-%type <numero> expresion expresion_simple termino factor
-%type <texto> instruccion instruccion_if instruccion_repeat instruccion_asignacion instruccion_read instruccion_write secuencia_instrucciones programa
+%type <numero> expresion expresion_simple termino factor NUMERO
+%type <texto> instruccion instruccion_if instruccion_repeat instruccion_asignacion instruccion_read instruccion_write secuencia_instrucciones programa IDENTIFICADOR
 
 %output "sintactico.cpp"
 
@@ -40,16 +46,25 @@ instruccion:
     | instruccion_asignacion
     | instruccion_read
     | instruccion_write
-   /*| error */ 
+    | error {
+                  yyerror("Error en la instrucción.");
+            }
 ;
 
 instruccion_if:
-      IF expresion THEN secuencia_instrucciones END
-    | IF expresion THEN secuencia_instrucciones ELSE secuencia_instrucciones END
+      IF expresion THEN secuencia_instrucciones END {
+      
+      						    }
+      						    
+    | IF expresion THEN secuencia_instrucciones ELSE secuencia_instrucciones END {
+    
+    										 }
 ;
 
 instruccion_repeat:
-      REPEAT secuencia_instrucciones UNTIL expresion
+      REPEAT secuencia_instrucciones UNTIL expresion {
+                          
+                                                     }
 ;
 
 instruccion_asignacion:
@@ -57,11 +72,15 @@ instruccion_asignacion:
 ;
 
 instruccion_read:
-      READ IDENTIFICADOR
+      READ IDENTIFICADOR {
+      
+                         }
 ;
 
 instruccion_write:
-      WRITE expresion
+      WRITE expresion {
+      			   printf("%f\n", $2); // Se imprime el valor de la expresión
+      		      }
 ;
 
 expresion:
@@ -78,7 +97,7 @@ expresion:
       					      }
     
     | expresion_simple DIFERENTE expresion_simple {
-       						    $$ = ($1 <> $3);
+       						      $$ = ($1 != $3);
       					      	  }
     
     | expresion_simple MENOR_IGUAL expresion_simple {
@@ -120,7 +139,7 @@ termino:
 
 factor:
       PARENTESIS_IZQ expresion PARENTESIS_DER {
-      						$$ = $2;
+      						  $$ = $2;
       					      }
     | NUMERO {
     		$$ = $1;
@@ -129,7 +148,7 @@ factor:
     			$$ = $1;
     	     	    }	
     | error {
-    		printf("\n===== > Error en factor\n");
+    		yyerror("Error en la instrucción.");
     	    }
 ;
 
