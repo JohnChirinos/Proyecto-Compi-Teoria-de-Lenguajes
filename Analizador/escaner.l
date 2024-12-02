@@ -5,19 +5,18 @@
 
    #pragma warning(disable: 4273 6011 4267)
 
-   int columna = 1;
-   int linea = 1;
+   unsigned int columna = 0;
+   unsigned int linea = 1;
    extern int yyerror(const char *s);
 %}
 
 %option outfile="escaner.cpp"
 %option noyywrap
 
-NUMERO   [0-9]+(\.[0-9]+)?
-IDENTIFICADOR   [a-zA-Z_][a-zA-Z0-9_]*
+NUMERO   [0-9]
+IDENTIFICADOR   [a-zA-Z]
 
 %%
-
 
 
 
@@ -134,7 +133,8 @@ IDENTIFICADOR   [a-zA-Z_][a-zA-Z0-9_]*
 	    
 {NUMERO}    { 
 		columna += strlen(yytext);
-		yylval.numero = (float)atof(yytext); return NUMERO; 
+		yylval.numero = (int)atoi(yytext); 
+		return NUMERO; 
 	    }
 	    
 {IDENTIFICADOR}  { 
@@ -143,20 +143,16 @@ IDENTIFICADOR   [a-zA-Z_][a-zA-Z0-9_]*
 			return IDENTIFICADOR; 
 		 }
 
-[\t] {
-	 columna += strlen(yytext);
-      }
-      
 [\n] { 
 	linea++; 
 	columna = 1;
      }
 
+[ \t] {
+	 columna += strlen(yytext);
+      }
+      
+
 . yyerror("Caracter invalido");
 
 %%
-
-int yywrap(void)
-{
-    return 1;
-}
